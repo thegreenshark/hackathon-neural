@@ -18,19 +18,19 @@ path = os.path.join(PATH_TO_SMALL_DATA, 'imgs/')
 
 if(not os.path.isdir(path)):
     os.mkdir(path)
-    
+
 trainFile = open('./data/train.csv', mode='r', encoding='utf-8')
 trainFileLines = trainFile.readlines()
 trainFile.close()
 
 
 
-trainOutLines = trainFileLines[:TRAIN_IMAGES_COUNT]
+trainOutLines = trainFileLines[:TRAIN_IMAGES_COUNT+1]
 
-#for j in range(TRAIN_IMAGES_COUNT):    
+#for j in range(TRAIN_IMAGES_COUNT):
 
     # lineIndex = random.randint(1, len(trainFileLines) - 1)
-    
+
     # while (trainFileLines[lineIndex] in trainOutLines): #не повторяемся
     #     lineIndex = random.randint(1, len(trainFileLines) - 1)
 
@@ -65,7 +65,7 @@ testFile = open('./data/test.csv', mode='r', encoding='utf-8')
 testFileLines = testFile.readlines()
 testFile.close()
 
-testOutLines = testFileLines[:TEST_IMAGES_COUNT]
+testOutLines = testFileLines[:TEST_IMAGES_COUNT+1]
 
 #for j in range(TEST_IMAGES_COUNT):
     # lineIndex = random.randint(1, len(testFileLines) - 1)

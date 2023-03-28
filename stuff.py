@@ -2,8 +2,8 @@ import numpy as np
 import cv2
 import os
 from imageHandler import formatImage
-        
-    
+
+
 
 def loadTrainData(imgDir, trainCsvPath, imgXres, imgYres):
     print('Reading training csv file...')
@@ -38,8 +38,8 @@ def loadTrainData(imgDir, trainCsvPath, imgXres, imgYres):
         filePath = imgDir + fileName
         if os.path.isfile(filePath):
             try:
-                image = formatImage(filePath)
-                
+                image = formatImage(filePath, (imgXres, imgYres))
+
                 #image = cv2.imread(image, 0) #TODO нет защиты от того, файл не является картинкой
                 # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #перевод в чернобелое
                 #image = cv2.resize(image, (512, 128)) #TODO

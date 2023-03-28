@@ -13,7 +13,7 @@ TRAIN_CSV_PATH = './data_small/train.csv'
 TEST_CSV_PATH = './data_small/test.csv'
 X_RESOLUTION = 512
 Y_RESOLUTION = 128
-USE_SAVED_MODEL = False
+USE_SAVED_MODEL = True
 
 
 
@@ -57,15 +57,13 @@ while 1:
     random.seed(datetime.datetime.now().timestamp())
     pictureIndex = random.randint(0, len(testFileNames) - 1)
 
-    testImage = cv2.imread(IMAGES_DIR + testFileNames[pictureIndex]) #TODO нет защиты от того, файл не является картинкой
-    testImage = cv2.cvtColor(testImage, cv2.COLOR_BGR2GRAY) #перевод в чернобелое
-    testImage = cv2.resize(testImage, (X_RESOLUTION, Y_RESOLUTION)) #TODO
-
+    testImage = formatImage(IMAGES_DIR + testFileNames[pictureIndex], (X_RESOLUTION, Y_RESOLUTION))
     model_answer = model.predict(np.array([testImage]))[0][0] #TODO не понял почему надо два раза [0]
 
     ans = 'это рукописный текст' if model_answer > 0.5 else'это печатный текст'
     print(f'Ответ нейросети: {ans}')
 
-    plt.imshow(testImage, cmap='binary')
+    showImage = cv2.imread(IMAGES_DIR + testFileNames[pictureIndex]) #TODO нет защиты от того, файл не является картинкой
+    plt.imshow(showImage)
     plt.axis('off')
     plt.show()
