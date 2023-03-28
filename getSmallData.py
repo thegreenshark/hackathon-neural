@@ -7,28 +7,34 @@ import datetime
 import shutil
 
 
-TRAIN_IMAGES_COUNT = 20000
+TRAIN_IMAGES_COUNT = 10000
 TEST_IMAGES_COUNT = 5000
+PATH_TO_SMALL_DATA = './data_small/'
+
 
 random.seed(datetime.datetime.now().timestamp())
 
+path = os.path.join(PATH_TO_SMALL_DATA, 'imgs/')
 
-
+if(not os.path.isdir(path)):
+    os.mkdir(path)
+    
 trainFile = open('./data/train.csv', mode='r', encoding='utf-8')
 trainFileLines = trainFile.readlines()
 trainFile.close()
 
 
 
-trainOutLines = []
-trainOutLines.append(trainFileLines[0])
+trainOutLines = trainFileLines[:TRAIN_IMAGES_COUNT]
 
-for j in range(TRAIN_IMAGES_COUNT):
-    lineIndex = random.randint(1, len(trainFileLines) - 1)
-    while (trainFileLines[lineIndex] in trainOutLines): #не повторяемся
-        lineIndex = random.randint(1, len(trainFileLines) - 1)
+#for j in range(TRAIN_IMAGES_COUNT):    
 
-    trainOutLines.append(trainFileLines[lineIndex])
+    # lineIndex = random.randint(1, len(trainFileLines) - 1)
+    
+    # while (trainFileLines[lineIndex] in trainOutLines): #не повторяемся
+    #     lineIndex = random.randint(1, len(trainFileLines) - 1)
+
+    #trainOutLines.append(trainFileLines[j])
 
 trainFile_small = open('./data_small/train.csv', mode='w', encoding='utf-8')
 trainFile_small.writelines(trainOutLines)
@@ -59,15 +65,13 @@ testFile = open('./data/test.csv', mode='r', encoding='utf-8')
 testFileLines = testFile.readlines()
 testFile.close()
 
-testOutLines = []
-testOutLines.append(testFileLines[0])
+testOutLines = testFileLines[:TEST_IMAGES_COUNT]
 
-for j in range(TEST_IMAGES_COUNT):
-    lineIndex = random.randint(1, len(testFileLines) - 1)
-    while (testFileLines[lineIndex] in testOutLines): #не повторяемся
-        lineIndex = random.randint(1, len(testFileLines) - 1)
-
-    testOutLines.append(testFileLines[lineIndex])
+#for j in range(TEST_IMAGES_COUNT):
+    # lineIndex = random.randint(1, len(testFileLines) - 1)
+    # while (testFileLines[lineIndex] in testOutLines): #не повторяемся
+    #     lineIndex = random.randint(1, len(testFileLines) - 1)
+    #testOutLines.append(testFileLines[lineIndex])
 
 
 testFile_small = open('./data_small/test.csv', mode='w', encoding='utf-8')

@@ -1,8 +1,9 @@
 import numpy as np
 import cv2
 import os
-
-
+from imageHandler import formatImage
+        
+    
 
 def loadTrainData(imgDir, trainCsvPath):
     print('Reading training csv file...')
@@ -36,13 +37,17 @@ def loadTrainData(imgDir, trainCsvPath):
 
         filePath = imgDir + fileName
         if os.path.isfile(filePath):
-            image = cv2.imread(filePath) #TODO нет защиты от того, файл не является картинкой
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #перевод в чернобелое
-            image = cv2.resize(image, (512, 128)) #TODO
-            #cv2.imwrite('./test/' + filePath, image)
-            x_train.append(image)
-            y_train.append(isHandWritten)
-
+            try:
+                image = formatImage(filePath)
+                
+                #image = cv2.imread(image, 0) #TODO нет защиты от того, файл не является картинкой
+                # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #перевод в чернобелое
+                #image = cv2.resize(image, (512, 128)) #TODO
+                #cv2.imwrite('./test/' + filePath, image)
+                x_train.append(image)
+                y_train.append(isHandWritten)
+            except Exception as ex:
+                print(ex)
 
 
         if count % progressStep == 0:

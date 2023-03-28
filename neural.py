@@ -11,7 +11,7 @@ import datetime
 IMAGES_DIR = './data_small/imgs/' #должен быть trailing slash
 TRAIN_CSV_PATH = './data_small/train.csv'
 TEST_CSV_PATH = './data_small/test.csv'
-USE_SAVED_MODEL = True
+USE_SAVED_MODEL = False
 
 
 
@@ -21,11 +21,9 @@ if not USE_SAVED_MODEL:
     print('Building neural network model...')
     model = Sequential()
 
-    model.add(Dense(32, activation='relu', input_shape=x_train[0].shape))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(256, activation='relu'))
-    model.add(Dense(512, activation='relu'))
+    model.add(Dense(2, activation='relu', input_shape=x_train[0].shape))
+    model.add(Dense(4, activation='relu'))
+    model.add(Dense(8, activation='relu'))
     model.add(Flatten())
     model.add(Dense(1, activation='sigmoid'))
 
