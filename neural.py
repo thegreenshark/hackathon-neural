@@ -11,12 +11,20 @@ import datetime
 IMAGES_DIR = './data_small/imgs/' #должен быть trailing slash
 TRAIN_CSV_PATH = './data_small/train.csv'
 TEST_CSV_PATH = './data_small/test.csv'
-USE_SAVED_MODEL = True
+X_RESOLUTION = 512
+Y_RESOLUTION = 128
+USE_SAVED_MODEL = False
 
 
 
 if not USE_SAVED_MODEL:
-    x_train, y_train = loadTrainData(IMAGES_DIR, TRAIN_CSV_PATH)
+    x_train, y_train = loadTrainData(IMAGES_DIR, TRAIN_CSV_PATH, X_RESOLUTION, Y_RESOLUTION)
+
+    #берем первые 2000 для авто теста модели
+    x_test = x_train[:2000]
+    x_train = x_train[2000:]
+    y_test = y_train[:2000]
+    y_train = y_train[2000:]
 
     print('Building neural network model...')
     model = Sequential()
@@ -36,6 +44,8 @@ if not USE_SAVED_MODEL:
     print('Training neural network...')
     model.fit(x_train, y_train, epochs=50 )
 
+    evalResult = model.evaluate(x_test, y_test)
+    print(f'Model evaluate results: loss={evalResult[0]}     accuracy={evalResult[1]}')
     model.save('./model')
 else:
     print('Loading neural network model...')
@@ -51,7 +61,7 @@ while 1:
 
     testImage = cv2.imread(IMAGES_DIR + testFileNames[pictureIndex]) #TODO нет защиты от того, файл не является картинкой
     testImage = cv2.cvtColor(testImage, cv2.COLOR_BGR2GRAY) #перевод в чернобелое
-    testImage = cv2.resize(testImage, (512, 128)) #TODO
+    testImage = cv2.resize(testImage, (X_RESOLUTION, Y_RESOLUTION)) #TODO
 
     model_answer = model.predict(np.array([testImage]))[0][0] #TODO не понял почему надо два раза [0]
 

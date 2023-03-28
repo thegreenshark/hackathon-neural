@@ -4,7 +4,7 @@ import os
 
 
 
-def loadTrainData(imgDir, trainCsvPath):
+def loadTrainData(imgDir, trainCsvPath, imgXres, imgYres):
     print('Reading training csv file...')
     trainFile = open(trainCsvPath, mode='r', encoding='utf-8')
     trainFileLines = trainFile.readlines()
@@ -24,22 +24,21 @@ def loadTrainData(imgDir, trainCsvPath):
         isHandWritten = int(splitLine[-1])
 
         #в текстах могут быть запятые, тогда split разбивает текст, а нам этого не надо
-        text = splitLine[0]
-        for k in range(1, len(splitLine) - 2):
-            text += splitLine[k]
+        # text = splitLine[0]
+        # for k in range(1, len(splitLine) - 2):
+        #     text += splitLine[k]
 
-        if len(text) > 0 and text[0] == '"':
-            text = text[1:]
-        if len(text) > 0 and text[-1] == '"':
-            text = text[:-1]
+        # if len(text) > 0 and text[0] == '"':
+        #     text = text[1:]
+        # if len(text) > 0 and text[-1] == '"':
+        #     text = text[:-1]
 
 
         filePath = imgDir + fileName
         if os.path.isfile(filePath):
             image = cv2.imread(filePath) #TODO нет защиты от того, файл не является картинкой
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #перевод в чернобелое
-            image = cv2.resize(image, (512, 128)) #TODO
-            #cv2.imwrite('./test/' + filePath, image)
+            image = cv2.resize(image, (imgXres, imgYres)) #TODO
             x_train.append(image)
             y_train.append(isHandWritten)
 
@@ -53,7 +52,7 @@ def loadTrainData(imgDir, trainCsvPath):
     x_train = np.array(x_train)
     y_train = np.array(y_train)
 
-    x_train = x_train/255
+    x_train = x_train / 255
 
     return x_train, y_train
 
