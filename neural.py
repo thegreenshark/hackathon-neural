@@ -108,16 +108,12 @@ print('100%')
 
 
 
-
 testAnswerLines = []
-testAnswerLines.append('name,label')
+testAnswerLines.append('name,label\n')
 
-TEST_CHUNK_SIZE = 20
+TEST_CHUNK_SIZE = 10000
 numberOfChunks = math.ceil(len(testFileNames) / TEST_CHUNK_SIZE)
 
-total = len(testFileNames)
-progressStep = total // 100
-count = 0
 print('Running test images...')
 for i in range(numberOfChunks):
     print(f'Chunk {i+1} of {numberOfChunks}')
@@ -128,15 +124,11 @@ for i in range(numberOfChunks):
 
     testImages_chunk = np.array(testImages[startIndex:endIndex]) / 255
 
-    model_answer = model.predict(testImages_chunk)[0]
-    print(model_answer)
-    isHandwritten = 1 if model_answer > 0.5 else 0
-    testAnswerLines.append(f'{fileName},{isHandwritten}')
+    model_answer = model.predict(testImages_chunk)
+    for j in range(startIndex, endIndex):
+        isHandwritten = 1 if model_answer[j - startIndex] > 0.5 else 0
+        testAnswerLines.append(f'{testFileNames[j]},{isHandwritten}\n')
 
-    if count % progressStep == 0:
-        print(f'{round(count / total * 100)}%', end="\r")
-    count += 1
-print('100%')
 
 testAnswersFile = open('./testAnswers.csv', mode='w', encoding='utf-8')
 testAnswersFile.writelines(testAnswerLines)
