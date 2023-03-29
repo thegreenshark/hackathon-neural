@@ -92,17 +92,44 @@ testFileNames = loadTestData(TEST_CSV_PATH)
 #     plt.axis('off')
 #     plt.show()
 
+testImages = []
+
+total = len(testFileNames)
+progressStep = total // 100
+count = 0
+print('Loading test images...')
+for fileName in testFileNames:
+    testImages.append(formatImage(IMAGES_DIR + fileName, (X_RESOLUTION, Y_RESOLUTION)))
+
+    if count % progressStep == 0:
+        print(f'{round(count / total * 100)}%', end="\r")
+    count += 1
+print('100%')
+
+
+
+
 testAnswerLines = []
 testAnswerLines.append('name,label')
 
+TEST_CHUNK_SIZE = 20
+numberOfChunks = math.ceil(len(testFileNames) / TEST_CHUNK_SIZE)
 
 total = len(testFileNames)
 progressStep = total // 100
 count = 0
 print('Running test images...')
-for fileName in testFileNames:
-    testImage = formatImage(IMAGES_DIR + fileName, (X_RESOLUTION, Y_RESOLUTION))
-    model_answer = model.predict(np.array([testImage]))[0][0]
+for i in range(numberOfChunks):
+    print(f'Chunk {i+1} of {numberOfChunks}')
+    startIndex = i * TEST_CHUNK_SIZE
+    endIndex = startIndex + TEST_CHUNK_SIZE
+    if endIndex > len(testFileNames):
+        endIndex = len(testFileNames)
+
+    testImages_chunk = np.array(testImages[startIndex:endIndex]) / 255
+
+    model_answer = model.predict(testImages_chunk)[0]
+    print(model_answer)
     isHandwritten = 1 if model_answer > 0.5 else 0
     testAnswerLines.append(f'{fileName},{isHandwritten}')
 
