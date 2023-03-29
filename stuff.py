@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import os
-from imageHandler import formatImage
+from imageHandler import formatImage, openImage
 
 
 
@@ -38,19 +38,11 @@ def loadTrainData(imgDir, trainCsvPath, imgXres, imgYres):
         
         
         filePath = imgDir + fileName
-        if os.path.isfile(filePath):
-            try:
-                image = formatImage(filePath, (imgXres, imgYres))
+        image = formatImage(filePath, (imgXres, imgYres))
+        #image = openImage(filePath)
 
-                #image = cv2.imread(image, 0) #TODO нет защиты от того, файл не является картинкой
-                # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #перевод в чернобелое
-                #image = cv2.resize(image, (512, 128)) #TODO
-                #cv2.imwrite('./test/' + filePath, image)
-                x_train.append(image)
-                y_train.append(isHandWritten)
-            except Exception as ex:
-                print(ex)
-
+        x_train.append(image)
+        y_train.append(isHandWritten)
 
         if count % progressStep == 0:
             print(f'{round(count / total * 100)}%', end="\r")
@@ -60,7 +52,7 @@ def loadTrainData(imgDir, trainCsvPath, imgXres, imgYres):
     #x_train = np.array(x_train)
     #y_train = np.array(y_train)
 
-    x_train = x_train / 255
+    # x_train = x_train / 255
 
     return x_train, y_train
 
