@@ -7,7 +7,7 @@ import datetime
 import shutil
 
 
-TRAIN_IMAGES_COUNT = 10000
+TRAIN_IMAGES_COUNT = 20000
 TEST_IMAGES_COUNT = 5000
 PATH_TO_SMALL_DATA = './data_small/'
 

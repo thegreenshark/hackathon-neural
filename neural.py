@@ -7,29 +7,44 @@ from keras.layers import Dense, Flatten
 from keras.models import Sequential, load_model
 import random
 import datetime
+import os
 
 IMAGES_DIR = './data_small/imgs/' #должен быть trailing slash
 TRAIN_CSV_PATH = './data_small/train.csv'
 TEST_CSV_PATH = './data_small/test.csv'
 X_RESOLUTION = 512
 Y_RESOLUTION = 128
+
+CURRENT_MODEL_NAME = "model"
+CURRENT_MODEL_PATH = os.path.join('./model', CURRENT_MODEL_NAME)
 USE_SAVED_MODEL = True
 
-
+ALL_IMAGES_COUNT = 122297
+CHUNK_SIZE = 5000
 
 if not USE_SAVED_MODEL:
-    x_train, y_train = loadTrainData(IMAGES_DIR, TRAIN_CSV_PATH, X_RESOLUTION, Y_RESOLUTION)
-
+    
+    if os.path.isdir(CURRENT_MODEL_PATH):
+        res = input(f"trained model named \"{CURRENT_MODEL_NAME}\" already exists and will be overwriten. Continue ? (y/n)")
+        if res.lower() != "y":  
+            exit()                  
+    else:
+        os.mkdir(CURRENT_MODEL_PATH)        
+    
     #берем первые 2000 для авто теста модели
-    x_test = x_train[:2000]
-    x_train = x_train[2000:]
-    y_test = y_train[:2000]
-    y_train = y_train[2000:]
 
+    current_chunk = 0
+    chunk_count = ALL_IMAGES_COUNT // CHUNK_SIZE + 1
+    
+     
     print('Building neural network model...')
     model = Sequential()
 
-    model.add(Dense(2, activation='relu', input_shape=x_train[0].shape))
+
+    x_train, y_train = loadTrainData(IMAGES_DIR, TRAIN_CSV_PATH, X_RESOLUTION, Y_RESOLUTION)
+    
+
+    model.add(Dense(256, activation='relu', input_shape=x_train[0].shape))
     model.add(Dense(4, activation='relu'))
     model.add(Dense(8, activation='relu'))
     model.add(Flatten())
@@ -40,14 +55,28 @@ if not USE_SAVED_MODEL:
                 metrics=['accuracy'])
 
     print('Training neural network...')
+    
+    
+    test_count = 2000
+    
+    x_test = np.array(x_train[:test_count])
+    y_test = np.array(y_train[:test_count])
+    
+    
+    while(current_chunk < chunk_count):
+        low = test_count + current_chunk * CHUNK_SIZE
+    
+    x_train = x_train[2000:]
+    y_train = y_train[2000:]
+    
     model.fit(x_train, y_train, epochs=50 )
-
+    
     evalResult = model.evaluate(x_test, y_test)
     print(f'Model evaluate results: loss={evalResult[0]}     accuracy={evalResult[1]}')
-    model.save('./model')
+    model.save(CURRENT_MODEL_PATH)
 else:
     print('Loading neural network model...')
-    model = load_model('./model')
+    model = load_model(CURRENT_MODEL_PATH)
 
 
 testFileNames = loadTestData(TEST_CSV_PATH)

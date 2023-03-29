@@ -35,6 +35,8 @@ def loadTrainData(imgDir, trainCsvPath, imgXres, imgYres):
         #     text = text[:-1]
 
 
+        
+        
         filePath = imgDir + fileName
         if os.path.isfile(filePath):
             try:
@@ -55,8 +57,8 @@ def loadTrainData(imgDir, trainCsvPath, imgXres, imgYres):
         count += 1
     print('100%')
 
-    x_train = np.array(x_train)
-    y_train = np.array(y_train)
+    #x_train = np.array(x_train)
+    #y_train = np.array(y_train)
 
     x_train = x_train / 255
 
