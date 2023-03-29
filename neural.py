@@ -12,11 +12,14 @@ import math
 IMAGES_DIR = './data/imgs/' #должен быть trailing slash
 TRAIN_CSV_PATH = './data/train.csv'
 TEST_CSV_PATH = './data/test.csv'
-NUMBER_OF_IMAGES_FOR_EVALUATE = 3000
-X_RESOLUTION = 100
+NUMBER_OF_IMAGES_FOR_EVALUATE = 3000 #сколько картинок из тренировочных будет отобрано для оценки модели
+CHUNK_SIZE = 30000 #сколько картинок будет за раз передаваться для обучения модели
+TEST_CHUNK_SIZE = 10000 #сколько картинок будет за раз передаваться для теста модели
+X_RESOLUTION = 100 #Разрешение к которому преобразуются все картинки
 Y_RESOLUTION = 25
-USE_SAVED_MODEL = True
-CHUNK_SIZE = 30000
+USE_SAVED_MODEL = True #True = загрузить с диска уже обученную модель; False = создать и обучить новую модель
+
+
 
 if not USE_SAVED_MODEL:
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -111,7 +114,6 @@ print('100%')
 testAnswerLines = []
 testAnswerLines.append('name,text,label\n')
 
-TEST_CHUNK_SIZE = 10000
 numberOfChunks = math.ceil(len(testFileNames) / TEST_CHUNK_SIZE)
 
 print('Running test images...')
