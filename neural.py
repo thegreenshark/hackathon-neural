@@ -9,13 +9,13 @@ import random
 import datetime
 import math
 
-IMAGES_DIR = './data_small/imgs/' #должен быть trailing slash
-TRAIN_CSV_PATH = './data_small/train.csv'
-TEST_CSV_PATH = './data_small/test.csv'
+IMAGES_DIR = './data/imgs/' #должен быть trailing slash
+TRAIN_CSV_PATH = './data/train.csv'
+TEST_CSV_PATH = './data/test.csv'
 NUMBER_OF_IMAGES_FOR_EVALUATE = 3000
 X_RESOLUTION = 160
 Y_RESOLUTION = 40
-USE_SAVED_MODEL = False
+USE_SAVED_MODEL = True
 CHUNK_SIZE = 30000
 
 if not USE_SAVED_MODEL:
@@ -75,17 +75,42 @@ else:
 testFileNames = loadTestData(TEST_CSV_PATH)
 
 
-while 1:
-    random.seed(datetime.datetime.now().timestamp())
-    pictureIndex = random.randint(0, len(testFileNames) - 1)
 
-    testImage = formatImage(IMAGES_DIR + testFileNames[pictureIndex], (X_RESOLUTION, Y_RESOLUTION))
-    model_answer = model.predict(np.array([testImage]))[0][0] #TODO не понял почему надо два раза [0]
 
-    ans = 'это рукописный текст' if model_answer > 0.5 else'это печатный текст'
-    print(f'Ответ нейросети: {ans}')
+# while 1:
+#     random.seed(datetime.datetime.now().timestamp())
+#     pictureIndex = random.randint(0, len(testFileNames) - 1)
 
-    showImage = cv2.imread(IMAGES_DIR + testFileNames[pictureIndex]) #TODO нет защиты от того, файл не является картинкой
-    plt.imshow(showImage)
-    plt.axis('off')
-    plt.show()
+#     testImage = formatImage(IMAGES_DIR + testFileNames[pictureIndex], (X_RESOLUTION, Y_RESOLUTION))
+#     model_answer = model.predict(np.array([testImage]))[0][0] #TODO не понял почему надо два раза [0]
+
+#     ans = 'это рукописный текст' if model_answer > 0.5 else'это печатный текст'
+#     print(f'Ответ нейросети: {ans}')
+
+#     showImage = cv2.imread(IMAGES_DIR + testFileNames[pictureIndex]) #TODO нет защиты от того, файл не является картинкой
+#     plt.imshow(showImage)
+#     plt.axis('off')
+#     plt.show()
+
+testAnswerLines = []
+testAnswerLines.append('name,label')
+
+
+total = len(testFileNames)
+progressStep = total // 100
+count = 0
+print('Running test images...')
+for fileName in testFileNames:
+    testImage = formatImage(IMAGES_DIR + fileName, (X_RESOLUTION, Y_RESOLUTION))
+    model_answer = model.predict(np.array([testImage]))[0][0]
+    isHandwritten = 1 if model_answer > 0.5 else 0
+    testAnswerLines.append(f'{fileName},{isHandwritten}')
+
+    if count % progressStep == 0:
+        print(f'{round(count / total * 100)}%', end="\r")
+    count += 1
+print('100%')
+
+testAnswersFile = open('./testAnswers.csv', mode='w', encoding='utf-8')
+testAnswersFile.writelines(testAnswerLines)
+testAnswersFile.close()
