@@ -109,7 +109,7 @@ print('100%')
 
 
 testAnswerLines = []
-testAnswerLines.append('name,label\n')
+testAnswerLines.append('name,text,label\n')
 
 TEST_CHUNK_SIZE = 10000
 numberOfChunks = math.ceil(len(testFileNames) / TEST_CHUNK_SIZE)
@@ -127,7 +127,7 @@ for i in range(numberOfChunks):
     model_answer = model.predict(testImages_chunk)
     for j in range(startIndex, endIndex):
         isHandwritten = 1 if model_answer[j - startIndex] > 0.5 else 0
-        testAnswerLines.append(f'{testFileNames[j]},{isHandwritten}\n')
+        testAnswerLines.append(f'{testFileNames[j]}, ,{isHandwritten}\n')
 
 
 testAnswersFile = open('./testAnswers.csv', mode='w', encoding='utf-8')
