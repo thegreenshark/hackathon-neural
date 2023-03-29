@@ -12,24 +12,27 @@ import math
 IMAGES_DIR = './data_small/imgs/' #должен быть trailing slash
 TRAIN_CSV_PATH = './data_small/train.csv'
 TEST_CSV_PATH = './data_small/test.csv'
-X_RESOLUTION = 200
-Y_RESOLUTION = 50
-USE_SAVED_MODEL = True
-CHUNK_SIZE = 1000
+NUMBER_OF_IMAGES_FOR_EVALUATE = 3000
+X_RESOLUTION = 160
+Y_RESOLUTION = 40
+USE_SAVED_MODEL = False
+CHUNK_SIZE = 30000
 
 if not USE_SAVED_MODEL:
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
     x_train, y_train = loadTrainData(IMAGES_DIR, TRAIN_CSV_PATH, X_RESOLUTION, Y_RESOLUTION)
 
-    #берем первые 2000 для авто теста модели
-    x_test = x_train[:2000]
-    x_train = x_train[2000:]
-    y_test = y_train[:2000]
-    y_train = y_train[2000:]
+    #берем часть картинок для evaluate
+    if NUMBER_OF_IMAGES_FOR_EVALUATE > 0:
+        x_test = x_train[:NUMBER_OF_IMAGES_FOR_EVALUATE]
+        x_train = x_train[NUMBER_OF_IMAGES_FOR_EVALUATE:]
+        y_test = y_train[:NUMBER_OF_IMAGES_FOR_EVALUATE]
+        y_train = y_train[NUMBER_OF_IMAGES_FOR_EVALUATE:]
 
-    x_test = np.array(x_test) / 255
-    y_test = np.array(y_test)
+        x_test = np.array(x_test) / 255
+        y_test = np.array(y_test)
+
     shapeSample = np.array(x_train[0]) / 255
 
     print('Building neural network model...')
@@ -59,9 +62,10 @@ if not USE_SAVED_MODEL:
 
         model.fit(x_train_chunk, y_train_chunk, epochs=5)
 
+    if NUMBER_OF_IMAGES_FOR_EVALUATE > 0:
+        evalResult = model.evaluate(x_test, y_test)
+        print(f'Model evaluate results: loss={evalResult[0]}     accuracy={evalResult[1]}')
 
-    evalResult = model.evaluate(x_test, y_test)
-    print(f'Model evaluate results: loss={evalResult[0]}     accuracy={evalResult[1]}')
     model.save('./model')
 else:
     print('Loading neural network model...')
