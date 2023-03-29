@@ -13,8 +13,8 @@ IMAGES_DIR = './data/imgs/' #должен быть trailing slash
 TRAIN_CSV_PATH = './data/train.csv'
 TEST_CSV_PATH = './data/test.csv'
 NUMBER_OF_IMAGES_FOR_EVALUATE = 3000
-X_RESOLUTION = 160
-Y_RESOLUTION = 40
+X_RESOLUTION = 100
+Y_RESOLUTION = 25
 USE_SAVED_MODEL = True
 CHUNK_SIZE = 30000
 
