@@ -18,7 +18,7 @@ TEST_CHUNK_SIZE = 10000 #сколько картинок будет за раз 
 X_RESOLUTION = 100 #Разрешение к которому преобразуются все картинки
 Y_RESOLUTION = 25
 USE_SAVED_MODEL = True #True = загрузить с диска уже обученную модель; False = создать и обучить новую модель
-
+INTERACTIVE_MODE = True #True = показывать тестовые картинки и выводить ответы; False = прогнать все тестовые картинки и записать ответы в файл
 
 
 if not USE_SAVED_MODEL:
@@ -79,59 +79,62 @@ testFileNames = loadTestData(TEST_CSV_PATH)
 
 
 
+if INTERACTIVE_MODE:
+    try:
+        while 1:
+            random.seed(datetime.datetime.now().timestamp())
+            pictureIndex = random.randint(0, len(testFileNames) - 1)
 
-# while 1:
-#     random.seed(datetime.datetime.now().timestamp())
-#     pictureIndex = random.randint(0, len(testFileNames) - 1)
+            testImage = formatImage(IMAGES_DIR + testFileNames[pictureIndex], (X_RESOLUTION, Y_RESOLUTION))
+            model_answer = model.predict(np.array([testImage]))[0][0]
 
-#     testImage = formatImage(IMAGES_DIR + testFileNames[pictureIndex], (X_RESOLUTION, Y_RESOLUTION))
-#     model_answer = model.predict(np.array([testImage]))[0][0] #TODO не понял почему надо два раза [0]
+            ans = 'это рукописный текст' if model_answer > 0.5 else'это печатный текст'
+            print(f'Ответ нейросети: {ans}')
 
-#     ans = 'это рукописный текст' if model_answer > 0.5 else'это печатный текст'
-#     print(f'Ответ нейросети: {ans}')
+            showImage = Image.open(IMAGES_DIR + testFileNames[pictureIndex])
+            plt.imshow(showImage)
+            plt.axis('off')
+            plt.show()
+    except KeyboardInterrupt: pass
 
-#     showImage = cv2.imread(IMAGES_DIR + testFileNames[pictureIndex]) #TODO нет защиты от того, файл не является картинкой
-#     plt.imshow(showImage)
-#     plt.axis('off')
-#     plt.show()
+else:
+    testImages = []
 
-testImages = []
+    total = len(testFileNames)
+    progressStep = total // 100
+    count = 0
+    print('Loading test images...')
+    for fileName in testFileNames:
+        testImages.append(formatImage(IMAGES_DIR + fileName, (X_RESOLUTION, Y_RESOLUTION)))
 
-total = len(testFileNames)
-progressStep = total // 100
-count = 0
-print('Loading test images...')
-for fileName in testFileNames:
-    testImages.append(formatImage(IMAGES_DIR + fileName, (X_RESOLUTION, Y_RESOLUTION)))
-
-    if count % progressStep == 0:
-        print(f'{round(count / total * 100)}%', end="\r")
-    count += 1
-print('100%')
-
-
-
-testAnswerLines = []
-testAnswerLines.append('name,text,label\n')
-
-numberOfChunks = math.ceil(len(testFileNames) / TEST_CHUNK_SIZE)
-
-print('Running test images...')
-for i in range(numberOfChunks):
-    print(f'Chunk {i+1} of {numberOfChunks}')
-    startIndex = i * TEST_CHUNK_SIZE
-    endIndex = startIndex + TEST_CHUNK_SIZE
-    if endIndex > len(testFileNames):
-        endIndex = len(testFileNames)
-
-    testImages_chunk = np.array(testImages[startIndex:endIndex]) / 255
-
-    model_answer = model.predict(testImages_chunk)
-    for j in range(startIndex, endIndex):
-        isHandwritten = 1 if model_answer[j - startIndex] > 0.5 else 0
-        testAnswerLines.append(f'{testFileNames[j]}, ,{isHandwritten}\n')
+        if count % progressStep == 0:
+            print(f'{round(count / total * 100)}%', end="\r")
+        count += 1
+    print('100%')
 
 
-testAnswersFile = open('./testAnswers.csv', mode='w', encoding='utf-8')
-testAnswersFile.writelines(testAnswerLines)
-testAnswersFile.close()
+
+    testAnswerLines = []
+    testAnswerLines.append('name,text,label\n')
+
+    numberOfChunks = math.ceil(len(testFileNames) / TEST_CHUNK_SIZE)
+
+    print('Running test images...')
+    for i in range(numberOfChunks):
+        print(f'Chunk {i+1} of {numberOfChunks}')
+        startIndex = i * TEST_CHUNK_SIZE
+        endIndex = startIndex + TEST_CHUNK_SIZE
+        if endIndex > len(testFileNames):
+            endIndex = len(testFileNames)
+
+        testImages_chunk = np.array(testImages[startIndex:endIndex]) / 255
+
+        model_answer = model.predict(testImages_chunk)
+        for j in range(startIndex, endIndex):
+            isHandwritten = 1 if model_answer[j - startIndex] > 0.5 else 0
+            testAnswerLines.append(f'{testFileNames[j]}, ,{isHandwritten}\n')
+
+
+    testAnswersFile = open('./testAnswers.csv', mode='w', encoding='utf-8')
+    testAnswersFile.writelines(testAnswerLines)
+    testAnswersFile.close()
